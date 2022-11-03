@@ -1,0 +1,56 @@
+
+/*
+ *  NAVIGATION BAR STYLE
+*/
+
+nav{
+    display: flex;
+    background-color: #abda7f;
+}
+nav > ul{
+    display: flex;
+    flex-direction: row;
+
+    list-style-type: none;
+}
+
+nav > ul > a > li{
+    background-color: aliceblue;
+
+    padding: 1rem;    
+    margin: 0.5rem;
+
+    font-size: x-large;
+    font-style: italic;
+
+}
+
+/*
+ *  PAGE CONTENT STYLE
+*/
+
+article{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+
+/*
+    The CSS below messes up the resolution of Canvas (due to display flex)
+    which makes all physics and logical checks proceed unexpected.
+    
+*/
+/*
+section{
+    display: flex;
+    flex-direction: column;
+    background-color:deepskyblue;
+    
+    padding: 2rem;
+}
+*/
+canvas{
+    background-color: rgb(240, 253, 255);
+    border: 2px solid black;
+}
