@@ -1,9 +1,32 @@
+import { GameObject }  from "./GameObject";
+
+
+let myObj = new GameObject();
+
 /**
  * @type {HTMLCanvasElement}
  */
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 let raf;
+
+
+
+
+const collisionCircle = {
+    x : 0,
+    y : 0,
+    radius : 0,
+    color: "#ff00ff",
+    draw(){
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, true);
+        ctx.closePath();
+
+        ctx.fillStyle = "#ff00ff";
+        ctx.fill();
+    }
+}
 
 //Sample ball object
 const ball = {
@@ -39,7 +62,9 @@ const playerBrick = {
 
         ctx.fillStyle = this.color;
         ctx.fill();
-    }    
+    },
+    getCenterX(){ return this.x + this.width / 2 },
+    getCenterY(){ return this.y + this.height / 2}
 };
 
 //Player configurations 
@@ -72,6 +97,10 @@ const brick = {
         ctx.fill();
         ctx.stroke();
 
+    },
+    detectColision()
+    {
+        ball.x 
     }
 
 }
@@ -81,6 +110,8 @@ ball.draw();
 playerBrick.draw();
 
 brick.draw();
+
+collisionCircle.draw();
 
 //Canvas draw function
 function draw()
@@ -92,13 +123,24 @@ function draw()
     playerBrick.draw();
     brick.draw();
 
+    collisionCircle.draw();
+
     //Physics Zone
     ball.x += ball.velocityX;
     ball.y += ball.velocityY;
 
     playerBrick.x = player.mousePosition["X"] - (playerBrick.width / 2) - canvas.offsetLeft
-
+    
+    
+    
     //Colisions zone
+    
+    ballColision();
+
+    //Debug Collisions
+    collisionCircle.x = playerBrick.getCenterX();
+    collisionCircle.y = playerBrick.getCenterY();
+    collisionCircle.radius = 30;
 
     //Detect collision with canvas border
     if((ball.y + ball.radius) + ball.velocityY > canvas.height || (ball.y - ball.radius) + ball.velocityY < 0)
@@ -122,7 +164,7 @@ function draw()
         playerBrick.x = 0
     }
     
-    
+    console.log(vectorDistance());
 
 
 
@@ -159,14 +201,73 @@ document.addEventListener("keydown", (event) => {
 //Move playerBrick conditions
 canvas.addEventListener("mousemove", (event) =>{
     player.mousePosition.X = event.clientX;
-    console.log(player.mousePosition.X);
 })
-
-
-
 
 
 function ClearCanvasScreen()
 {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 };
+
+
+function ballColision()
+{
+    //TEMP VARIABLE, MUST BE SET IN GAME CONFIGURATIONS
+    let minCollRange = 20;
+
+    if (vectorDistance() < minCollRange)
+    {
+        console.log("BALL COLLISION");
+    }
+}
+
+
+
+
+
+
+
+
+/**
+ *  COLLISIONS LOGIC
+ * 
+ * To keep a predictable and prevent lots of math calculatinons, this is the flow
+ * of how collidable objects should organize and react.
+ * 
+ * 
+ * 
+ * [Collidable Object]
+ * 
+ * 1 - Create a pulse calculating the distance with all objects in game. (No Sqrt needed)
+ * 2 - Based on its speed, create a list *possible* next frame collisions. The list contain all objects close enough
+ * 3 -  Iterate each object in the list for the distance (sqrt)
+ * 4 - If an object passed the minimium threshold, a collision has been detected.
+ * 4.1 - Extra step --> create another list of objects, this time we get the target and the contact point (collision position) 
+ * 5. If the object is physical, do all physics math. Else, end here. 
+ */
+
+
+
+
+/**
+ * MATH FUNCTIONS TO WITH LINEAR ALGEBRA, GEOMETRY AND  PHYSICS 
+*/
+
+/**
+ * Calculates the distance between two positions
+ * @param {number} a Position of point A
+ * @param {number} b Position of point B
+ * @returns numeric positive distance
+ */
+function distance(a, b)
+{
+    return Math.abs(a - b);
+}
+
+function vectorDistance()
+{
+    let a = distance(ball.x, playerBrick.getCenterX());
+    let b = distance(ball.y, playerBrick.getCenterY());
+
+    return Math.sqrt((a**2) + (b**2));
+}
